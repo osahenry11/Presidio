@@ -3,6 +3,9 @@ from bs4 import BeautifulSoup
 from nltk.tokenize import sent_tokenize
 from nltk.stem import PorterStemmer
 from googlesearch import search
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
 
 def search_topic(topic):
     # Perform a Google search to retrieve relevant URLs
@@ -48,11 +51,14 @@ def process_sentences(sentences, topic):
 
     return None
 
-# Main program loop
-while True:
-    topic = input("Enter a topic (or 'q' to quit): ")
-    if topic.lower() == 'q':
-        break
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        topic = request.form['topic']
+        result = search_topic(topic)
+        return render_template('index.html', result=result)
+    
+    return render_template('index.html')
 
-    result = search_topic(topic)
-    print(result)
+if __name__ == '__main__':
+    app.run(debug=True)
